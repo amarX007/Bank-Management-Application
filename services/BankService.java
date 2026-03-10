@@ -20,6 +20,7 @@ import java.util.List;
 public class BankService {
     private final CustomerDao customerDao = new CustomerDao();
     private final AccountDao accountDao = new AccountDao();
+    private AccountDao balanceDao = new AccountDao();
     private final TransactionDao transactionDao = new TransactionDao();
     private final ReceiptService receiptService = new ReceiptService();
 
@@ -324,7 +325,21 @@ public class BankService {
 
     }
 
-    // SERVICE 7 - VIEW ACCOUNT DETAILS ✅
+    // SERVICE 7 - CHECK ACCOUNT BALANCE
+    public void checkAccountBalance(long accNumber) throws SQLException {
+
+        double balance = balanceDao.getBalance(accNumber);
+
+        if (balance == -1) {
+            System.out.println("Account not found!");
+            return;
+        }
+
+        System.out.println("Account Number: " + accNumber);
+        System.out.println("Your account balance is: " + balance);
+    }
+
+    // SERVICE 8 - VIEW ACCOUNT DETAILS ✅
     public void accountDetails(long accNumber)
     {
         try {
@@ -361,7 +376,7 @@ public class BankService {
         }
     }
 
-    // SERVICE 8 - UPDATE ACCOUNT DETAILS - HERE Customers can Update their specific required Details (e.g., Names, Email, Phone Number, Address).
+    // SERVICE 9 - UPDATE ACCOUNT DETAILS - HERE Customers can Update their specific required Details (e.g., Names, Email, Phone Number, Address).
 
     // FirstName
     public void updateFirstName(long accNumber,

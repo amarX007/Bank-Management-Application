@@ -1,10 +1,11 @@
 import services.BankService;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         BankService service = new BankService();
         Scanner sc = new Scanner(System.in);
         int choice;
@@ -23,9 +24,10 @@ public class Main {
             System.out.println("4. Deposit money");
             System.out.println("5. Transfer money to another account");
             System.out.println("6. View transaction history");
-            System.out.println("7. View account details");
-            System.out.println("8. Update account details");
-            System.out.println("9. EXIT");
+            System.out.println("7. Check account balance: ");
+            System.out.println("8. View account details");
+            System.out.println("9. Update account details");
+            System.out.println("10. EXIT");
 
             System.out.print("Enter your choice : ");
             choice = sc.nextInt();
@@ -101,15 +103,21 @@ public class Main {
                     service.transactionHistory(accNumber);
                     break;
 
-                //to view account details
                 case 7:
+                    System.out.print("Enter your bank account number : ");
+                    accNumber = sc.nextLong();
+                    service.checkAccountBalance(accNumber);
+                    break;
+
+                //to view account details
+                case 8:
                     System.out.print("Enter your bank account number : ");
                     accNumber = sc.nextLong();
                     service.accountDetails(accNumber);
                     break;
 
                 //to update account details (FirstName - LastName - Email - PhoneNumber - Address)
-                case 8:
+                case 9:
                     System.out.print("Enter account number: ");
                     accNumber = sc.nextLong();
                     sc.nextLine();
@@ -170,7 +178,7 @@ public class Main {
                     } while (customerChoose != 6);
                     break;
 
-                case 9:
+                case 10:
                     System.out.println("Thank you for visiting SUN bank!\n Have a wonderful day ahead.");
                     System.out.println();
                     System.out.println("==================================================");
@@ -180,6 +188,6 @@ public class Main {
                     System.out.println("Please enter correct option.");
                     break;
             }
-        }while (choice != 9);
+        }while (choice != 10);
     }
 }

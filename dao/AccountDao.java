@@ -4,8 +4,6 @@ import model.Account;
 import utill.DBUtil;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class AccountDao {
 
@@ -93,4 +91,24 @@ public class AccountDao {
             System.out.println("Rows updated: " + rows);
         }
     }
+
+    // SERVICE - 7 (FOR CHECKING BALANCE)
+    public double getBalance (long accNumber) throws SQLException {
+        String sql = "SELECT Balance FROM bankaccounts WHERE AccountNumber = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            ps.setLong(1, accNumber);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("Balance");
+            }
+
+        }
+        return -1;
+    }
+
 }
