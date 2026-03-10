@@ -1,0 +1,21 @@
+OUR SERVICES FROM OUR BANK -
+
+
+i. CREATE NEW ACCOUNT - Code and usable logic done. ✅
+
+ii. CLOSE ACCOUNT - All criteria for close account has been completed, it is runnable and visible in our database. ✅
+
+iii. WITHDRAW MONEY - Yes, customers can withdraw their money with their individual account numbers & other needy documents. ✅
+
+iv. DEPOSIT MONEY - So, our bank has the basic service for depositing money from our customer. It is with full dominance features. ✅
+
+v. Transfer Person to Person - Workable criteria is completed. Structural work is working, to deploy is as a real world level project, I have to work more on it. ✅
+
+vi. VIEW TRANSACTION HISTORY - Transaction history is ready for exploring, Customers can see their whole transaction. ✅
+
+vii. VIEW ACCOUNT DETAILS - Customers can see their account details efficiently. ✅
+
+viii. UPDATE ACCOUNT DETAILS - Customers can change their First-Name, Last-Name, Email-address, Phone-number, Physical-address. ✅
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Deployable in GitHub.
