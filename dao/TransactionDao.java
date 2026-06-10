@@ -28,8 +28,8 @@ public class TransactionDao {
             }
             ps.setString(6, t.getDescription());
 
-            int rows = ps.executeUpdate();
-            System.out.println("Transaction inserted rows: " + rows);
+            ps.executeUpdate();
+
         }
     }
 

@@ -11,14 +11,24 @@ public class Customer {
     private String address;
 
 
+
+    private String pin;
+
+
     // create Constructor
-    public Customer(String firstName, String lastName, String email, String phone, String address) {
+    public Customer(String firstName,
+                    String lastName,
+                    String email,
+                    String phone,
+                    String address) {
+
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.address = address;
     }
+
 
 
     // create Getter n Setter
@@ -68,5 +78,14 @@ public class Customer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    //Extra work
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
     }
 }

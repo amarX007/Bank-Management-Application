@@ -10,15 +10,17 @@ public class Account {
     private double accountBalance;
     private String status;
     private LocalDate openingDate;
+    private String pinHash;
 
     // constructor
-    public Account(long accountNumber, int customerId, String accountType, double accountBalance, String status, LocalDate openingDate) {
+    public Account(long accountNumber, int customerId, String accountType, double accountBalance, String status, LocalDate openingDate, String pinHash) {
         this.accountNumber = accountNumber;
         this.customerId = customerId;
         this.accountType = accountType;
         this.accountBalance = accountBalance;
         this.status = status;
         this.openingDate = openingDate;
+        this.pinHash = pinHash;
     }
 
     //getter n setter
@@ -68,5 +70,13 @@ public class Account {
 
     public void setOpeningDate(LocalDate openingDate) {
         this.openingDate = openingDate;
+    }
+
+    public String getPinHash() {
+        return pinHash;
+    }
+
+    public void setPinHash(String pinHash) {
+        this.pinHash = pinHash;
     }
 }

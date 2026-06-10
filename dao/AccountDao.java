@@ -10,7 +10,7 @@ public class AccountDao {
     // SERVICE 1 - TO CREATE ACCOUNT
     public boolean createAccount(Account account) throws SQLException
     {
-        String sql = "INSERT INTO bankaccounts (AccountNumber, CustomerID, AccountType, Balance, Status, OpeningDate) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO bankaccounts (AccountNumber, CustomerID, AccountType, Balance, Status, OpeningDate, pin_hash) VALUES (?,?,?,?,?,?,?)";
 
         try (//Data Base connection
              Connection connection = DBUtil.getConnection();
@@ -23,6 +23,7 @@ public class AccountDao {
             ps.setDouble(4, account.getAccountBalance());
             ps.setString(5, account.getStatus());
             ps.setDate(6, Date.valueOf(account.getOpeningDate()));
+            ps.setString(7, account.getPinHash());
             int projectRules = ps.executeUpdate();
             if (projectRules == 0) return false;
         }
@@ -37,23 +38,26 @@ public class AccountDao {
 
         try(//CREATE CONNECTION, PREPARE THE SQL STATEMENT FOR EXECUTION
             Connection connection = DBUtil.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);)
-        {
-            ps.setLong(1, accNumber);
+            PreparedStatement ps = connection.prepareStatement(sql);) {
 
+            ps.setLong(1, accNumber);
             //execute the query
             ResultSet record = ps.executeQuery(); //this will store Row returned by DBMS
 
             //extract details from the resultset and create an object of Account class
-            record.next();
+            if (!record.next()) {
+                return null;
+            }
+
             Account ac = new Account
                     (record.getLong("AccountNumber"),
                             record.getInt("CustomerID"),
                             record.getString("AccountType"),
                             record.getDouble("Balance"),
                             record.getString("Status"),
-                            record.getDate("OpeningDate").toLocalDate());
-
+                            record.getDate("OpeningDate").toLocalDate(),
+                            record.getString("pin_hash")
+                    );
             return ac;
         }
     }
@@ -87,8 +91,7 @@ public class AccountDao {
             ps.setDouble(1, acc.getAccountBalance());
             ps.setLong(2, acc.getAccountNumber());
 
-            int rows = ps.executeUpdate();
-            System.out.println("Rows updated: " + rows);
+            ps.executeUpdate();
         }
     }
 
@@ -110,5 +113,4 @@ public class AccountDao {
         }
         return -1;
     }
-
 }

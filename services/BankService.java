@@ -1,5 +1,6 @@
 package services;
 
+import com.sun.jdi.connect.spi.Connection;
 import dao.AccountDao;
 import dao.CustomerDao;
 import dao.TransactionDao;
@@ -10,9 +11,10 @@ import model.Account;
 import model.Customer;
 import model.Transaction;
 import reciepts.ReceiptService;
+import utill.DBUtil;
 
+import java.security.MessageDigest;
 import java.sql.SQLException;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.List;
 public class BankService {
     private final CustomerDao customerDao = new CustomerDao();
     private final AccountDao accountDao = new AccountDao();
-    private AccountDao balanceDao = new AccountDao();
+//    private AccountDao balanceDao = new AccountDao();
     private final TransactionDao transactionDao = new TransactionDao();
     private final ReceiptService receiptService = new ReceiptService();
 
@@ -33,6 +35,35 @@ public class BankService {
         return min + (long)(Math.random() * (max-min));
     }
 
+    // hash PIN
+    private String hashPin(String pin) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte [] hash = md.digest(pin.getBytes());
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error hashing PIN", e);
+        }
+    }
+
+    // Authenticate
+    public boolean authenticate(long accNumber, String pin) {
+        try {
+            Account acc = accountDao.getAccount(accNumber);
+            if (acc == null) return false;
+
+            return acc.getPinHash() !=null && acc.getPinHash().equals(hashPin(pin));
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
 
 
     // SERVICE 1 - CREATE ACCOUNT ✅
@@ -40,26 +71,44 @@ public class BankService {
                               String lname,
                               String email,
                               String pno,
-                              String address)
+                              String address,
+                              String pin)
     {
         try{
+
+            if (!pin.matches("\\d{4}")) {
+                System.out.println("PIN must be 4 digits.");
+                return;
+            }
+
             //CREATE A NEW CUSTOMER RECORD
             Customer customer = new Customer(fname, lname, email, pno, address);
-
             //THEN GET THE customerID
             int customerID = customerDao.createCustomer(customer);
 
+
             if (customerID == -1){ //IF THERE IS NO customerID
-                System.out.println("Failed to create customer entry.");
+                System.out.println("Failed to create customer.");
                 return;
             }
 
             //USE THE customerID TO CREATE A NEW RECORD IN SQL(BANKACCOUNT) TABLE
-            long accNumber = this.generateAccountNumber();
-            Account account = new Account(accNumber, customerID, "Savings", 0.0, "Active", LocalDate.now());
+            long accNumber = generateAccountNumber();
+            String hashedPin = hashPin(pin);
+
+            Account account = new Account(
+                    accNumber,
+                    customerID,
+                    "Savings",
+                    0.0,
+                    "Active",
+                    LocalDate.now(),
+                    hashedPin
+            );
 
             if (accountDao.createAccount(account)) {
-                System.out.println("Account created successfully.\n Your account number : " + accNumber);
+                System.out.println("Account created successfully." +
+                                   "\n Account number : " + accNumber);
             } else {
                 System.out.println("Errors! Failed to create account.");
             }
@@ -74,6 +123,7 @@ public class BankService {
     {
         try {
             Account acc = accountDao.getAccount(accountNumber);
+
             if (acc == null){
                 throw new AccountNotFoundException("Account does not exist at SUN Bank.");
             }
@@ -282,6 +332,7 @@ public class BankService {
                  SQLException e){
             System.out.println("Error: " + e.getMessage());
         }
+
     }
 
 
@@ -328,7 +379,7 @@ public class BankService {
     // SERVICE 7 - CHECK ACCOUNT BALANCE
     public void checkAccountBalance(long accNumber) throws SQLException {
 
-        double balance = balanceDao.getBalance(accNumber);
+        double balance = accountDao.getBalance(accNumber);
 
         if (balance == -1) {
             System.out.println("Account not found!");
@@ -345,10 +396,12 @@ public class BankService {
         try {
             Account acc = accountDao.getAccount(accNumber);
 
-            Customer customer = customerDao.getCustomerByID(acc.getCustomerId());
             if (acc == null){
                 throw new AccountNotFoundException("Account does not exist at SUN Bank.");
             }
+
+            Customer customer = customerDao.getCustomerByID(acc.getCustomerId());
+
             System.out.println("==============================");
             System.out.println("       ACCOUNT DETAILS        ");
             System.out.println("==============================");

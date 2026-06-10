@@ -1,6 +1,5 @@
 import services.BankService;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -10,6 +9,9 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int choice;
 
+        boolean isLoggedIn = false;
+        long loggedInAccount = -1;
+
         do{
             //Welcome interface
             System.out.println("\t==============================");
@@ -18,16 +20,18 @@ public class Main {
 
             //Services for customer
             System.out.println("Choose your service from the options : ");
+            System.out.println("0. Login");
             System.out.println("1. Create new account");
             System.out.println("2. Close account");
             System.out.println("3. Withdraw money");
             System.out.println("4. Deposit money");
             System.out.println("5. Transfer money to another account");
             System.out.println("6. View transaction history");
-            System.out.println("7. Check account balance: ");
+            System.out.println("7. Check account balance");
             System.out.println("8. View account details");
             System.out.println("9. Update account details");
-            System.out.println("10. EXIT");
+            System.out.println("10. Logout");
+            System.out.println("11. EXIT");
 
             System.out.print("Enter your choice : ");
             choice = sc.nextInt();
@@ -35,12 +39,35 @@ public class Main {
 
             switch (choice){
 
-                //to create account
+                // 🔏 LOGIN
+                case 0:
+                    if (isLoggedIn) {
+                        System.out.println("Already logged in!");
+                        break;
+                    }
+
+                    System.out.print("Enter account number : ");
+                    long accNumber = sc.nextLong();
+                    sc.nextLine();
+
+                    System.out.print("Enter PIN : ");
+                    String pin = sc.nextLine();
+
+                    if (service.authenticate(accNumber, pin)) {
+                        isLoggedIn = true;
+                        loggedInAccount = accNumber;
+                        System.out.println("Login Successful!");
+                    } else  {
+                        System.out.println("Invalid credentials!");
+                    }
+                    break;
+
+                // 🆕 CREATE ACCOUNT
                 case 1:
-                    System.out.print("Enter account holder's first name : ");
+                    System.out.print("Enter first name : ");
                     String fname = sc.nextLine();
 
-                    System.out.print("Enter account holder's last name : ");
+                    System.out.print("Enter last name : ");
                     String lname = sc.nextLine();
 
                     System.out.print("Enter email : ");
@@ -52,77 +79,112 @@ public class Main {
                     System.out.print("Enter address : ");
                     String address = sc.nextLine();
 
+                    System.out.print("Set 4-digit PIN : ");
+                    pin = sc.nextLine();
 
-                    service.createAccount(fname, lname, email, pno, address);
+
+                    service.createAccount(fname, lname, email, pno, address, pin);
                     break;
 
-                //to close account
+                // 🔒 CLOSE ACCOUNT
                 case 2:
-                    System.out.print("Enter bank account number : ");
-                    long accNumber = sc.nextLong();
-                    sc.nextLine();
-                    service.closeAccount(accNumber);
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
+
+//                    System.out.print("Enter bank account number : ");
+//                    long accNumber = sc.nextLong();
+//                    sc.nextLine();
+
+
+                    service.closeAccount(loggedInAccount);
                     break;
 
-                //to withdraw money
+                // 💸 WITHDRAW
                 case 3:
-                    System.out.print("Enter bank account number : ");
-                    accNumber = sc.nextLong();
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
+
                     System.out.print("Enter amount: ");
                     double amount = sc.nextDouble();
-                    service.withdraw(accNumber, amount);
+                    sc.nextLine();
+
+                    service.withdraw(loggedInAccount, amount);
                     break;
 
-                //to deposit money
+                // 💰 DEPOSIT
                 case 4:
-                    System.out.print("Enter bank account number : ");
-                    accNumber = sc.nextLong();
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
 
                     System.out.print("Enter amount : ");
                     amount = sc.nextDouble();
-                    service.deposit(accNumber, amount);
+                    sc.nextLine();
+
+                    service.deposit(loggedInAccount, amount);
                     break;
 
-                //to transfer money to another account
+                // 🔁 TRANSFER
                 case 5:
-                    System.out.print("Enter your bank account number : ");
-                    accNumber = sc.nextLong();
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
 
                     System.out.print("Enter receiver's account number : ");
                     long recAccNumber = sc.nextLong();
+                    sc.nextLine();
 
                     System.out.print("Enter amount : ");
                     amount = sc.nextDouble();
-                    service.transfer(accNumber, recAccNumber, amount);
+                    sc.nextLine();
+
+                    service.transfer(loggedInAccount, recAccNumber, amount);
                     break;
 
-                //to view transaction ID
+                // 📜 TRANSACTION HISTORY
                 case 6:
-                    System.out.print("Enter your bank account number : ");
-                    accNumber = sc.nextLong();
-                    service.transactionHistory(accNumber);
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
+
+                    service.transactionHistory(loggedInAccount);
                     break;
 
+                // 💳 CHECK BALANCE
                 case 7:
-                    System.out.print("Enter your bank account number : ");
-                    accNumber = sc.nextLong();
-                    service.checkAccountBalance(accNumber);
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
+
+                    service.checkAccountBalance(loggedInAccount);
                     break;
 
-                //to view account details
+                // 📃 ACCOUNT DETAILS
                 case 8:
-                    System.out.print("Enter your bank account number : ");
-                    accNumber = sc.nextLong();
-                    service.accountDetails(accNumber);
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
+
+                    service.accountDetails(loggedInAccount);
                     break;
 
                 //to update account details (FirstName - LastName - Email - PhoneNumber - Address)
                 case 9:
-                    System.out.print("Enter account number: ");
-                    accNumber = sc.nextLong();
-                    sc.nextLine();
+                    if (!isLoggedIn) {
+                        System.out.println("Please login first!");
+                        break;
+                    }
 
-                    int customerChoose;
+                    int option;
 
                     do {
                         System.out.println("\nSelect details to update: ");
@@ -131,41 +193,41 @@ public class Main {
                         System.out.println("3. Email: ");
                         System.out.println("4. Phone Number: ");
                         System.out.println("5. Address: ");
-                        System.out.println("6. Go Back");
+                        System.out.println("6. Back");
 
                         System.out.print("Enter your choice: ");
-                        customerChoose = sc.nextInt();
+                        option = sc.nextInt();
                         sc.nextLine();
 
-                        switch (customerChoose) {
+                        switch (option) {
                             case 1:
                                 System.out.print("Enter new First Name: ");
                                 String newFname = sc.nextLine();
-                                service.updateFirstName(accNumber, newFname);
+                                service.updateFirstName(loggedInAccount, newFname);
                                 break;
 
                             case 2:
                                 System.out.println("Enter new Last Name: ");
                                 String newLname = sc.nextLine();
-                                service.updateLastName(accNumber, newLname);
+                                service.updateLastName(loggedInAccount, newLname);
                                 break;
 
                             case 3:
                                 System.out.println("Enter new Email: ");
                                 String newEmail = sc.nextLine();
-                                service.updateEmail(accNumber, newEmail);
+                                service.updateEmail(loggedInAccount, newEmail);
                                 break;
 
                             case 4:
                                 System.out.println("Enter new Phone Number: ");
                                 String newPhoneNumber = sc.nextLine();
-                                service.updatePhoneNumber(accNumber, newPhoneNumber);
+                                service.updatePhoneNumber(loggedInAccount, newPhoneNumber);
                                 break;
 
                             case 5:
                                 System.out.println("Enter new Address: ");
                                 String newAddress = sc.nextLine();
-                                service.updateAddress(accNumber, newAddress);
+                                service.updateAddress(loggedInAccount, newAddress);
                                 break;
 
                             case 6:
@@ -175,10 +237,22 @@ public class Main {
                             default:
                                 System.out.println("Invalid Selection! Kindly choose from the given values.");
                         }
-                    } while (customerChoose != 6);
+                    } while (option != 6);
                     break;
 
+                // 🧱 LOGOUT
                 case 10:
+                    if (!isLoggedIn) {
+                        System.out.println("You are not logged in.");
+                    } else {
+                        isLoggedIn = false;
+                        loggedInAccount = -1;
+                        System.out.println("Logged out Successfully.");
+                    }
+                    break;
+
+                // ❌ EXIT
+                case 11:
                     System.out.println("Thank you for visiting SUN bank!\n Have a wonderful day ahead.");
                     System.out.println();
                     System.out.println("==================================================");
@@ -188,6 +262,6 @@ public class Main {
                     System.out.println("Please enter correct option.");
                     break;
             }
-        }while (choice != 10);
+        }while (choice != 11);
     }
 }
